@@ -13,12 +13,10 @@ class FewShotModel(nn.Module):
             hdim = 640
             from model.networks.res12 import ResNet
             self.encoder = ResNet()
-            
         elif args.backbone_class == 'Res12_PPA':
             hdim = 640
             from model.networks.res12_PPA import Res12_PPA
             self.encoder = Res12_PPA()
-            
         elif args.backbone_class == 'Res18':
             hdim = 512
             from model.networks.res18 import ResNet

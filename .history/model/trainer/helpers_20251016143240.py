@@ -128,19 +128,23 @@ def prepare_model(args):
     if args.init_weights is not None:
         model_dict = model.state_dict()        
         pretrained_dict = torch.load(args.init_weights)['params']
-        print("执行之前",pretrained_dict.keys())
         if args.backbone_class == 'ConvNet':
             pretrained_dict = {'encoder.'+k: v for k, v in pretrained_dict.items()}
         elif args.backbone_class == 'Res12_PPA':
-            remap_dict = {}
+            remapped_dict = {}
             for k, v in pretrained_dict.items():
-            # 直接进行字符串替换
-                new_k = 'encoder.'+k.replace('.layer1.', '.0.') \
-                        .replace('.layer2.', '.1.') \
-                        .replace('.layer3.', '.2.') \
-                        .replace('.layer4.', '.3.')
-                remap_dict[new_k] = v
-            pretrained_dict = remap_dict
+                new_k = k
+                if k.startswith('layer1.'):
+                    new_k = 'encoder.0.' + k[len('layer1.'):]
+                elif k.startswith('layer2.'):
+                    new_k = 'encoder.1.' + k[len('layer2.'):]
+                elif k.startswith('layer3.'):
+                    new_k = 'encoder.2.' + k[len('layer3.'):]
+                elif k.startswith('layer4.'):
+                    new_k = 'encoder.3.' + k[len('layer4.'):]
+                # 注意：原始的 avgpool 权重我们不需要，因为新模型有自己的 avgpool
+                remapped_dict[new_k] = v
+            pretrained_dict = remapped_dict # 使用重映射后的字典
         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
         print(pretrained_dict.keys())
         model_dict.update(pretrained_dict)

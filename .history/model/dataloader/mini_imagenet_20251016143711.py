@@ -80,7 +80,6 @@ class MiniImageNet(Dataset):
                 transforms_list + [
                 transforms.Normalize(np.array([x / 255.0 for x in [120.39586422,  115.59361427, 104.54012653]]),
                                      np.array([x / 255.0 for x in [70.68188272,   68.27635443,  72.54505529]]))
-            ])
         elif args.backbone_class == 'Res18':
             self.transform = transforms.Compose(
                 transforms_list + [

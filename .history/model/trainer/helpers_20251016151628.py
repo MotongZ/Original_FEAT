@@ -135,7 +135,7 @@ def prepare_model(args):
             remap_dict = {}
             for k, v in pretrained_dict.items():
             # 直接进行字符串替换
-                new_k = 'encoder.'+k.replace('.layer1.', '.0.') \
+                new_k = k.replace('.layer1.', '.0.') \
                         .replace('.layer2.', '.1.') \
                         .replace('.layer3.', '.2.') \
                         .replace('.layer4.', '.3.')

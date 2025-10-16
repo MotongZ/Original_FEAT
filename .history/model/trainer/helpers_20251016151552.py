@@ -135,12 +135,12 @@ def prepare_model(args):
             remap_dict = {}
             for k, v in pretrained_dict.items():
             # 直接进行字符串替换
-                new_k = 'encoder.'+k.replace('.layer1.', '.0.') \
+                new_k = k.replace('.layer1.', '.0.') \
                         .replace('.layer2.', '.1.') \
                         .replace('.layer3.', '.2.') \
                         .replace('.layer4.', '.3.')
                 remap_dict[new_k] = v
-            pretrained_dict = remap_dict
+            pretrained_dict = {k: v for k, v in remap_dict.items() if k in model_dict}
         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
         print(pretrained_dict.keys())
         model_dict.update(pretrained_dict)

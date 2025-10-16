@@ -128,19 +128,9 @@ def prepare_model(args):
     if args.init_weights is not None:
         model_dict = model.state_dict()        
         pretrained_dict = torch.load(args.init_weights)['params']
-        print("执行之前",pretrained_dict.keys())
         if args.backbone_class == 'ConvNet':
             pretrained_dict = {'encoder.'+k: v for k, v in pretrained_dict.items()}
-        elif args.backbone_class == 'Res12_PPA':
-            remap_dict = {}
-            for k, v in pretrained_dict.items():
-            # 直接进行字符串替换
-                new_k = 'encoder.'+k.replace('.layer1.', '.0.') \
-                        .replace('.layer2.', '.1.') \
-                        .replace('.layer3.', '.2.') \
-                        .replace('.layer4.', '.3.')
-                remap_dict[new_k] = v
-            pretrained_dict = remap_dict
+        elif args.backbone_class == 'Res12_PPA'
         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
         print(pretrained_dict.keys())
         model_dict.update(pretrained_dict)

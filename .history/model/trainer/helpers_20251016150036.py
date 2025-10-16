@@ -132,15 +132,26 @@ def prepare_model(args):
         if args.backbone_class == 'ConvNet':
             pretrained_dict = {'encoder.'+k: v for k, v in pretrained_dict.items()}
         elif args.backbone_class == 'Res12_PPA':
-            remap_dict = {}
+            print("执行PPA部分的权重重映射...")
+            remapped_dict = {}
             for k, v in pretrained_dict.items():
-            # 直接进行字符串替换
-                new_k = 'encoder.'+k.replace('.layer1.', '.0.') \
-                        .replace('.layer2.', '.1.') \
-                        .replace('.layer3.', '.2.') \
-                        .replace('.layer4.', '.3.')
-                remap_dict[new_k] = v
-            pretrained_dict = remap_dict
+                if k.startswith('encoder.'):
+                    k_stripped = k[len('encoder.'):] # 例如, 'encoder.layer1...' -> 'layer1...'
+                else:
+                    k_stripped = k # 如果没有，则保持原样
+                new_k = k_stripped # 默认情况下，新键等于剥离后的键
+                if k_stripped.startswith('layer1.'):
+                    new_k = 'encoder.0.' + k_stripped[len('layer1.'):]
+                elif k_stripped.startswith('layer2.'):
+                    new_k = 'encoder.1.' + k_stripped[len('layer2.'):]
+                elif k_stripped.startswith('layer3.'):
+                    new_k = 'encoder.2.' + k_stripped[len('layer3.'):]
+                elif k_stripped.startswith('layer4.'):
+                    new_k = 'encoder.3.' + k_stripped[len('layer4.'):]
+
+                if new_k in model_dict:
+                    remapped_dict[new_k] = v
+            pretrained_dict = remapped_dict
         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
         print(pretrained_dict.keys())
         model_dict.update(pretrained_dict)
