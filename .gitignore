@@ -12,7 +12,7 @@ data/
 saves/
 checkpoints/
 imgs/
-./history/
+.history/
 
 
 # Distribution / packaging
