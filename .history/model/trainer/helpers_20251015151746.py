@@ -82,9 +82,9 @@ def get_dataloader(args):
                                       max(args.way, args.num_classes),
                                       args.shot + args.query)
     
-    # train_batch_sampler = BatchedCategoriesSampler(train_sampler,
-    #                                                batch_size=2,
-    #                                                drop_last=True)
+    train_batch_sampler = BatchedCategoriesSampler(train_sampler,
+                                                   batch_size=2,
+                                                   drop_last=True)
     train_loader = DataLoader(dataset=trainset,
                                   num_workers=num_workers,
                                   batch_sampler=train_sampler,

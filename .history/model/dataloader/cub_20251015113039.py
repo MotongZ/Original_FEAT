@@ -1,30 +1,32 @@
-import torch
 import os.path as osp
+import PIL
 from PIL import Image
 
+import numpy as np
 from torch.utils.data import Dataset
 from torchvision import transforms
-from tqdm import tqdm
-import numpy as np
+import torch
 
 THIS_PATH = osp.dirname(__file__)
-ROOT_PATH = osp.abspath(osp.join(THIS_PATH, '..', '..'))
-ROOT_PATH2 = osp.abspath(osp.join(THIS_PATH, '..', '..', '..'))
-# IMAGE_PATH1 = osp.join(ROOT_PATH2, 'miniimagenet\\images')
-# SPLIT_PATH = osp.join(ROOT_PATH, 'miniimagenet\\split')
-IMAGE_PATH1 = osp.join(ROOT_PATH, 'data','miniimagenet', 'miniimagenet', 'images')  # C:\DataSet\FEAT\data\miniimagenet\images
-SPLIT_PATH = osp.join(ROOT_PATH, 'data', 'miniimagenet', 'split')     # C:\DataSet\FEAT\data\miniimagenet\split
-CACHE_PATH = osp.join(ROOT_PATH, '.cache/')
+ROOT_PATH1 = osp.abspath(osp.join(THIS_PATH, '..', '..', '..'))
+ROOT_PATH2 = osp.abspath(osp.join(THIS_PATH, '..', '..'))
+IMAGE_PATH = osp.join(ROOT_PATH1, 'data/cub')
+SPLIT_PATH = osp.join(ROOT_PATH2, 'data/cub/split')
+CACHE_PATH = osp.join(ROOT_PATH2, '.cache/')
+
+# This is for the CUB dataset
+# It is notable, we assume the cub images are cropped based on the given bounding boxes
+# The concept labels are based on the attribute value, which are for further use (and not used in this work)
 
 def identity(x):
     return x
 
-class MiniImageNet(Dataset):
-    """ Usage:
-    """
+class CUB(Dataset):
+
     def __init__(self, setname, args, augment=False):
         im_size = args.orig_imsize
-        csv_path = osp.join(SPLIT_PATH, setname + '.csv')
+        txt_path = osp.join(SPLIT_PATH, setname + '.csv')
+        lines = [x.strip() for x in open(txt_path, 'r').readlines()][1:]
         cache_path = osp.join( CACHE_PATH, "{}.{}.{}.pt".format(self.__class__.__name__, setname, im_size) )
 
         self.use_im_cache = ( im_size != -1 ) # not using cache
@@ -32,7 +34,7 @@ class MiniImageNet(Dataset):
             if not osp.exists(cache_path):
                 print('* Cache miss... Preprocessing {}...'.format(setname))
                 resize_ = identity if im_size < 0 else transforms.Resize(im_size)
-                data, label = self.parse_csv(csv_path, setname)
+                data, label = self.parse_csv(txt_path)
                 self.data = [ resize_(Image.open(path).convert('RGB')) for path in data ]
                 self.label = label
                 print('* Dump cache from {}'.format(cache_path))
@@ -43,11 +45,11 @@ class MiniImageNet(Dataset):
                 self.data  = cache['data']
                 self.label = cache['label']
         else:
-            self.data, self.label = self.parse_csv(csv_path, setname)
-
-        self.num_class = len(set(self.label))
-
+            self.data, self.label = self.parse_csv(txt_path)
+        
+        self.num_class = np.unique(np.array(self.label)).shape[0]
         image_size = 84
+        
         if augment and setname == 'train':
             transforms_list = [
                   transforms.RandomResizedCrop(image_size),
@@ -90,25 +92,27 @@ class MiniImageNet(Dataset):
         else:
             raise ValueError('Non-supported Network Types. Please Revise Data Pre-Processing Scripts.')
 
-    def parse_csv(self, csv_path, setname):
-        lines = [x.strip() for x in open(csv_path, 'r').readlines()][1:]
-
+    def parse_csv(self, txt_path):
         data = []
         label = []
         lb = -1
-
         self.wnids = []
+        lines = [x.strip() for x in open(txt_path, 'r').readlines()][1:]
 
-        for l in tqdm(lines, ncols=64):
-            name, wnid = l.split(',')
-            path = osp.join(IMAGE_PATH1, name)
+        for l in lines:
+            context = l.split(',')
+            name = context[0] 
+            wnid = context[1]
+            path = osp.join(IMAGE_PATH, name)
             if wnid not in self.wnids:
                 self.wnids.append(wnid)
                 lb += 1
-            data.append( path )
+                
+            data.append(path)
             label.append(lb)
 
         return data, label
+
 
     def __len__(self):
         return len(self.data)
@@ -119,6 +123,5 @@ class MiniImageNet(Dataset):
             image = self.transform(data)
         else:
             image = self.transform(Image.open(data).convert('RGB'))
-        
-        return image, label
+        return image, label            
 

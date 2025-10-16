@@ -89,17 +89,14 @@ class FEAT(FewShotModel):
         self.slf_attn = MultiHeadAttention(1, hdim, hdim, hdim, dropout=0.5)          
         
     def _forward(self, instance_embs, support_idx, query_idx):
-        # embs:(16*5) * 640 ; supportid:[[[0,16,32,48,64]]]; queryid:[[[1,2..15],[17,18..31]..]]
-        
         emb_dim = instance_embs.size(-1)
 
         # organize support/query data
         support = instance_embs[support_idx.contiguous().view(-1)].contiguous().view(*(support_idx.shape + (-1,)))
         query   = instance_embs[query_idx.contiguous().view(-1)].contiguous().view(  *(query_idx.shape   + (-1,)))
-        #support.shape = [supportid.shape,featuredim] = [1,1,5,640]
-        
+    
         # get mean of the support
-        proto = support.mean(dim=1) # Ntask x NK x d = [1,5,640]
+        proto = support.mean(dim=1) # Ntask x NK x d
         num_batch = proto.shape[0]
         num_proto = proto.shape[1]
         num_query = np.prod(query_idx.shape[-2:])

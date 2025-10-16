@@ -14,7 +14,7 @@ from model.utils import (
     Averager, Timer, count_acc, one_hot,
     compute_confidence_interval,
 )
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 from collections import deque
 from tqdm import tqdm
 

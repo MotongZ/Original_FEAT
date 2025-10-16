@@ -8,11 +8,8 @@ __pycache__/
 
 # 数据不上传
 data/
-# saves 模型权重不上传，checkpoints没必要？
-saves/
-checkpoints/
-imgs/
-
+# saves 模型权重不上传
+saves
 
 # Distribution / packaging
 .Python

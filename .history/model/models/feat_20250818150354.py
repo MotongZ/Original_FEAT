@@ -96,10 +96,10 @@ class FEAT(FewShotModel):
         # organize support/query data
         support = instance_embs[support_idx.contiguous().view(-1)].contiguous().view(*(support_idx.shape + (-1,)))
         query   = instance_embs[query_idx.contiguous().view(-1)].contiguous().view(  *(query_idx.shape   + (-1,)))
-        #support.shape = [supportid.shape,featuredim] = [1,1,5,640]
+        #support.shape = [suppodrid.shape,featuredim] = [1,1,5,640]
         
         # get mean of the support
-        proto = support.mean(dim=1) # Ntask x NK x d = [1,5,640]
+        proto = support.mean(dim=1) # Ntask x NK x d
         num_batch = proto.shape[0]
         num_proto = proto.shape[1]
         num_query = np.prod(query_idx.shape[-2:])

@@ -181,6 +181,6 @@ def get_command_line_parser():
     parser.add_argument('--eval_interval', type=int, default=1)
     parser.add_argument('--save_dir', type=str, default='./checkpoints')
     
-    # parser.add_argument('--batch_size',type=int,default=1,help='Number of episodes per batch')
+    parser.add_argument('--batch_size',type=int,default=1,help='Number of episodes per batch')
     
     return parser

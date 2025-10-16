@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-class FewShotModel(nn.Module):  
+class FewShotModel(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.args = args

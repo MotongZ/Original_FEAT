@@ -10,8 +10,7 @@ __pycache__/
 data/
 # saves 模型权重不上传，checkpoints没必要？
 saves/
-checkpoints/
-imgs/
+checkpoints
 
 
 # Distribution / packaging
