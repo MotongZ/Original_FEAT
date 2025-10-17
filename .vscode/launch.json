@@ -10,7 +10,7 @@
       "args": [
         "--max_epoch", "200",
         "--model_class", "ProtoNet",
-        "--backbone_class", "Res12_PPA",
+        "--backbone_class", "Res12",
         "--dataset", "MiniImageNet",
         "--way", "5",
         "--eval_way", "5",
@@ -29,7 +29,9 @@
         "--gpu", "0",
         "--init_weights", "./saves/initialization/miniimagenet/protonet-5-shot.pth",
         "--eval_interval", "1",
-        "--use_euclidean"
+        "--use_euclidean",
+        "--augment",
+        "--seed","3407"
       ]
     }
   ]

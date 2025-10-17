@@ -70,7 +70,7 @@ class BasicBlock(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block=BasicBlock, keep_prob=1.0, avg_pool=True, drop_rate=0.1, dropblock_size=5):
+    def __init__(self, block=BasicBlock, keep_prob=1.0, avg_pool=False, drop_rate=0.1, dropblock_size=5):
         self.inplanes = 3
         super(ResNet, self).__init__()
 
@@ -114,7 +114,7 @@ class ResNet(nn.Module):
         x = self.layer4(x)
         if self.keep_avg_pool:
             x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
+            x = x.view(x.size(0), -1)
         return x
 
 

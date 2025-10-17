@@ -5,6 +5,35 @@ import pprint
 import torch
 import argparse
 import numpy as np
+import random
+
+def set_seed(seed):
+    """设置所有随机种子以确保实验可重现性"""
+    print(f'🌱 Setting random seed to {seed}')
+    
+    # 1. Python标准库random
+    random.seed(seed)
+    
+    # 2. NumPy随机数
+    np.random.seed(seed)
+    
+    # 3. PyTorch CPU随机数
+    torch.manual_seed(seed)
+    
+    # 4. PyTorch CUDA随机数
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)  # 多GPU情况
+    
+    # 5. 确保CUDNN确定性（重要！）
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    # 6. 设置环境变量（Python hash随机化）
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    
+    print(f'✅ Random seed {seed} set successfully')
+    return seed
 
 def one_hot(indices, depth):
     """
@@ -180,7 +209,9 @@ def get_command_line_parser():
     parser.add_argument('--log_interval', type=int, default=50)
     parser.add_argument('--eval_interval', type=int, default=1)
     parser.add_argument('--save_dir', type=str, default='./checkpoints')
-    
+        
+    parser.add_argument('--seed',type = int,default=1)
+    # parser.add_argument('--avg_pool',type=bool,default=True)
     # parser.add_argument('--batch_size',type=int,default=1,help='Number of episodes per batch')
     
     return parser
